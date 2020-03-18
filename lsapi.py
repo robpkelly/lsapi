@@ -56,6 +56,8 @@ parser.add_argument('-u', '--ugly', action='store_true',
                     help="use basic ASCII for tree drawing (for terminal emulators with spotty unicode support)")
 parser.add_argument('-U', '--no-tree', action='store_true', help="do not draw trees")
 parser.add_argument('-C', '--no-color', action='store_true', help="do not colorize output")
+parser.add_argument('-D', '--max-depth', action='store', type=int,
+                    help="do not show names nested beyond this depth from the given root package (which has depth 0)")
 args = parser.parse_args()
 
 package = importlib.import_module(args.package)
@@ -243,20 +245,24 @@ def predicate_factory(namespace):
         return lambda value: True
 
 
-def _handle_name(source_ns, name, value, tab, subtab):
+def _handle_name(source_ns, name, value, depth, tab, subtab):
     print(tab + fmt_name(name, value))
     if inspect.ismodule(value) or inspect.isclass(value):
-        if args.external or in_package(package, value):
+        if args.max_depth is not None and depth >= args.max_depth:
+            print(subtab + tree.stop + color('[...]', fg='red', style='bold'))
+        elif args.external or in_package(package, value):
             if value in known_namespaces:
-                print(subtab + '└─' + color(f'see {known_namespaces[value]}', fg='red', style='bold'))
+                print(subtab + tree.stop + color(f'see {known_namespaces[value]}', fg='red', style='bold'))
             else:
                 known_namespaces[value] = f'{source_ns.__name__}.{name}'
-                walk_names(value, subtab)
+                walk_names(value, depth + 1, subtab)
         else:
-            print(subtab + '└─' + color(f'external {fmt_type(type(value))} {value.__name__}', fg='red', style='bold'))
+            print(subtab + tree.stop + color(
+                f'external {fmt_type(type(value))} {value.__name__}', fg='red', style='bold'
+            ))
 
 
-def walk_names(namespace, tab=''):
+def walk_names(namespace, depth, tab=''):
 
     names = []
     classes = []
@@ -275,11 +281,11 @@ def walk_names(namespace, tab=''):
     all_names = names + classes + modules
     if len(all_names) > 0:
         for name, value in all_names[:-1]:
-            _handle_name(namespace, name, value, tab=tab + tree.fork, subtab=tab + tree.line)
+            _handle_name(namespace, name, value, depth, tab=tab + tree.fork, subtab=tab + tree.line)
 
         name, value = all_names[-1]
-        _handle_name(namespace, name, value, tab=tab + tree.stop, subtab=tab + tree.open)
+        _handle_name(namespace, name, value, depth, tab=tab + tree.stop, subtab=tab + tree.open)
 
 
 print(fmt_name(args.package, package))
-walk_names(package)
+walk_names(package, depth=1)
