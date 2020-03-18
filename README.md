@@ -37,3 +37,20 @@ optional arguments:
   -U, --no-tree     do not draw trees
   -C, --no-color    do not colorize output
 ```
+
+## notes
+
+`lsapi` inspects packages by loading them through python's import mechanism and
+inspecting the result, instead of compiling and inspecting the AST. This allows
+for limited operability with packages distributed as wheels and C-language
+extensions, but also means that names imported elsewhere will likely be listed
+under the "wrong" namespace. In other words, the output of this script is
+_complete_ and _correct_, but may be _counterintuitive_. With the `-c` flag,
+`lsapi` will attempt to show names where they were canonically defined, but it
+can't catch everything.
+
+If you see strange symbols in `lsapi`'s output, like �, ▯, or
+[mojibake](https://en.wikipedia.org/wiki/Mojibake), it's probably because your
+terminal emulator doesn't know how to render the glyphs `lsapi` uses to draw
+trees. Use the `-u` or `-U` flags, but also consider switching to a modern
+terminal emulator.
