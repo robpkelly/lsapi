@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-"""Recursively list the public names exposed by a package, formatted as a readable tree"""
+"""Recursively list the public names exposed by a Python package, formatted as a readable tree"""
 
 import importlib
 import argparse
