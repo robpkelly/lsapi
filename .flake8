@@ -1,0 +1,5 @@
+# -*- mode: conf; -*-
+
+[flake8]
+# 120 characters is a more agreeable max line length for modern displays
+max-line-length=120
