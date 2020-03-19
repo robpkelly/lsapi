@@ -5,6 +5,7 @@ import importlib
 import argparse
 from colors import color
 import inspect
+from pathlib import Path
 
 
 # Unicode patterns for drawing trees to stdout
@@ -208,10 +209,10 @@ def is_canon(namespace, value):
             if inspect.ismodule(value):
                 if hasattr(value, '__path__'):
                     # subpackage value
-                    return value.__path__[0].startswith(namespace.__path__[0])
+                    return Path(value.__path__[0]).parent == Path(namespace.__path__[0])
                 else:
                     # module value
-                    return get_source_file_nonesafe(value).startswith(namespace.__path__[0])
+                    return Path(get_source_file_nonesafe(value)).parent == Path(namespace.__path__[0])
             else:
                 # other value
                 return get_source_file_nonesafe(value) == inspect.getsourcefile(namespace)
