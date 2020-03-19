@@ -43,15 +43,16 @@ known_namespaces = {}
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('package', type=str, help="package (or sub-package) to inspect")
-parser.add_argument('-p', '--private', action='store_true', help="include private names")
-parser.add_argument('-m', '--magic', action='store_true', help="include magic names")
-parser.add_argument('-a', '--all', action='store_true', help="include all names (equivalent to `-pm')")
+parser.add_argument('-p', '--private', action='store_true', help="show private names")
+parser.add_argument('-m', '--magic', action='store_true', help="show magic names")
+parser.add_argument('-a', '--all', action='store_true', help="show all names (equivalent to `-pm')")
 parser.add_argument('-c', '--canonical', action='store_true',
-                    help="try to display names under the namespace where they are defined")
+                    help="try to show names under the namespace where they are defined")
 parser.add_argument('-x', '--external', action='store_true',
                     help="show names exposed by packages that are not under the given root package")
 parser.add_argument('-s', '--signatures', action='store_true',
-                    help="display signatures for callables (functions, methods, classes)")
+                    help="show signatures for callables (functions, methods, classes)")
+parser.add_argument('-A', '--aliases', action='store_true', help="show aliased (imported) namespaces")
 parser.add_argument('-u', '--ugly', action='store_true',
                     help="use basic ASCII for tree drawing (for terminal emulators with spotty unicode support)")
 parser.add_argument('-U', '--no-tree', action='store_true', help="do not draw trees")
@@ -250,7 +251,7 @@ def _handle_name(source_ns, name, value, depth, tab, subtab):
         if not (args.external or in_package(package, value)):
             note = color(f'[external {fmt_type(type(value))} {value.__name__}]', fg='red', style='bold')
             print(f"{line} {note}")
-        elif value in known_namespaces:
+        elif not args.aliases and value in known_namespaces:
             note = color(f'[see {known_namespaces[value]}]', fg='red', style='bold')
             print(f"{line} {note}")
         else:

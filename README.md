@@ -13,7 +13,8 @@ $ ln -s $PWD/lsapi.py ~/bin/lsapi
 
 ```console
 $ lsapi -h
-usage: lsapi [-h] [-p] [-m] [-a] [-c] [-x] [-s] [-u] [-U] [-C] [-D MAX_DEPTH]
+usage: lsapi [-h] [-p] [-m] [-a] [-c] [-x] [-s] [-A] [-u] [-U] [-C]
+             [-D MAX_DEPTH]
              package
 
 Recursively list the public names exposed by a Python package, formatted as a
@@ -24,15 +25,16 @@ positional arguments:
 
 optional arguments:
   -h, --help            show this help message and exit
-  -p, --private         include private names
-  -m, --magic           include magic names
-  -a, --all             include all names (equivalent to `-pm')
-  -c, --canonical       try to display names under the namespace where they
-                        are defined
+  -p, --private         show private names
+  -m, --magic           show magic names
+  -a, --all             show all names (equivalent to `-pm')
+  -c, --canonical       try to show names under the namespace where they are
+                        defined
   -x, --external        show names exposed by packages that are not under the
                         given root package
-  -s, --signatures      display signatures for callables (functions, methods,
+  -s, --signatures      show signatures for callables (functions, methods,
                         classes)
+  -A, --aliases         show aliased (imported) namespaces
   -u, --ugly            use basic ASCII for tree drawing (for terminal
                         emulators with spotty unicode support)
   -U, --no-tree         do not draw trees
