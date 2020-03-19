@@ -229,7 +229,6 @@ def is_canon(namespace, value):
         elif isinstance(value, property):
             # this is pretty sketchy
             return any([
-                # is_canon(namespace, getattr(value, attr))
                 getattr(value, attr).__qualname__.rsplit('.', 1)[0] == namespace.__name__
                 for attr in ['fget', 'fset', 'fdel']
                 if inspect.isfunction(getattr(value, attr))
@@ -246,24 +245,26 @@ def predicate_factory(namespace):
 
 
 def _handle_name(source_ns, name, value, depth, tab, subtab):
-    print(tab + fmt_name(name, value))
+    line = tab + fmt_name(name, value)
     if inspect.ismodule(value) or inspect.isclass(value):
-        if args.max_depth is not None and depth >= args.max_depth:
-            print(subtab + tree.stop + color('[...]', fg='red', style='bold'))
-        elif args.external or in_package(package, value):
-            if value in known_namespaces:
-                print(subtab + tree.stop + color(f'see {known_namespaces[value]}', fg='red', style='bold'))
+        if not (args.external or in_package(package, value)):
+            note = color(f'[external {fmt_type(type(value))} {value.__name__}]', fg='red', style='bold')
+            print(f"{line} {note}")
+        elif value in known_namespaces:
+            note = color(f'[see {known_namespaces[value]}]', fg='red', style='bold')
+            print(f"{line} {note}")
+        else:
+            print(line)
+            if args.max_depth is not None and depth >= args.max_depth:
+                print(subtab + tree.stop + color('[...]', fg='red', style='bold'))
             else:
                 known_namespaces[value] = f'{source_ns.__name__}.{name}'
                 walk_names(value, depth + 1, subtab)
-        else:
-            print(subtab + tree.stop + color(
-                f'external {fmt_type(type(value))} {value.__name__}', fg='red', style='bold'
-            ))
+    else:
+        print(line)
 
 
 def walk_names(namespace, depth, tab=''):
-
     names = []
     classes = []
     modules = []
